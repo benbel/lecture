@@ -1,4 +1,5 @@
 import pypandoc
+import re
 import requests
 
 from bs4 import BeautifulSoup
@@ -37,18 +38,25 @@ def scrap_fs(s):
       result = get_url(url, s)
       raw_links = [link for link in result.find_all("a") if link and link.get('href')]
       pdf_links = [link for link in raw_links if link.get('href').endswith('pdf')]
-      parsed_links = [(link.text, link.get('href')) for link in pdf_links]
+      parsed_links = [(re.sub("\(.*?\)", "", link.text).strip(), link.get('href')) for link in pdf_links]
       return parsed_links
 
     return reduce(lambda x,y: x+y, [scrap_fs_page(i, s) for i in range(0,3)])
 
 
 def scrap_cae(s):
+    def find_cae_pdf(page, s):
+      result = get_url(page, s)
+      raw_links = [h2.find("a") for h2 in result.find_all("h2")]
+      pdf_link = [link.get('href') for link in raw_links if link.get('href').endswith("pdf")]
+      if len(pdf_link) == 1:
+        return "https://www.cae-eco.fr{pdf}".format(pdf = pdf_link.pop())
+
     def scrap_cae_page(page, s):
       url = "https://www.cae-eco.fr/{page}-CAE-0".format(page = page)
       result = get_url(url, s)
       raw_links = [h2.find("a") for h2 in result.find_all("h2")]
-      parsed_links = [(link.text, "https://www.cae-eco.fr/{}".format(link.get('href'))) for link in raw_links]
+      parsed_links = [(link.text, find_cae_pdf("https://www.cae-eco.fr/{}".format(link.get('href')), s)) for link in raw_links]
       return parsed_links
 
     return scrap_cae_page("Notes", s)
