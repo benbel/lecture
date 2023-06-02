@@ -51,7 +51,7 @@ def scrap_cae(s):
       parsed_links = [(link.text, "https://www.cae-eco.fr/{}".format(link.get('href'))) for link in raw_links]
       return parsed_links
 
-    return scrap_cae_page("Focus", s) + scrap_cae_page("Notes", s)
+    return scrap_cae_page("Notes", s)
 
 
 def generate_html(source, data):
