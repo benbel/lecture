@@ -21,6 +21,21 @@ def get_url(url, s):
         return
 
 
+def scrap_jep(s):
+    base_url = "https://www.aeaweb.org/journals/jep/issues"
+    result = get_url(base_url, s)
+    issues = [re.match("/issues/(.*)", link.get('href')).group(1) for link in result.find_all("a") if link and "/issues/" in link.get('href')]
+    
+    last_issue = max(map(int, issues))
+    
+    url = "https://www.aeaweb.org/issues/" + str(last_issue)
+    result = get_url(url, s)
+    links = [link for link in result.find_all("a") if link and "/articles?id=" in link.get('href')]
+    get_pdf_link = lambda link: "https://www.aeaweb.org/articles/pdf/doi/" + re.match("\/articles\?id\=(.*)", link.get('href')).group(1)
+    parsed_links = [(link.text.strip(), get_pdf_link(link)) for link in links]
+    return parsed_links
+
+
 def scrap_fs(s):
     def scrap_fs_page(page, s):
       url = "https://www.strategie.gouv.fr/publications?page={page}".format(page = page)
@@ -64,7 +79,8 @@ def main():
 
     scrap_function_by_source = {
         "France Stratégie": scrap_fs,
-        "Conseil d'analyse économique": scrap_cae
+        "Conseil d'analyse économique": scrap_cae,
+        "Journal of Economic Perspectives": scrap_jep
         }
 
     results = {
