@@ -31,7 +31,7 @@ def main():
     with open('output/results.json', 'r') as json_file:
           results = json.load(json_file)
 
-    html_chunks = [generate_html(source, data) for source, data in results.items()]
+    html_chunks = [generate_html(source, data) for source, data in results.items() if data]
 
     text = \
         read_file("programs/header.html") \
