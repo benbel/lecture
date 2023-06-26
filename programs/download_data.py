@@ -25,9 +25,9 @@ def scrap_jep(s):
     base_url = "https://www.aeaweb.org/journals/jep/issues"
     result = get_url(base_url, s)
     issues = [re.match("/issues/(.*)", link.get('href')).group(1) for link in result.find_all("a") if link and "/issues/" in link.get('href')]
-    
+
     last_issue = max(map(int, issues))
-    
+
     url = "https://www.aeaweb.org/issues/" + str(last_issue)
     result = get_url(url, s)
     links = [link for link in result.find_all("a") if link and "/articles?id=" in link.get('href')]
@@ -83,8 +83,11 @@ def main():
         "Journal of Economic Perspectives": scrap_jep
         }
 
+    with open('output/results.json', 'r') as json_file:
+          old_results = json.load(json_file)
+
     results = {
-        source: scrap_source(s)
+        source: [link for link in scrap_source(s) if link[0] not in [old_link[0] for old_link in old_results.get(source, {})]]
         for source, scrap_source in scrap_function_by_source.items()
         }
 
