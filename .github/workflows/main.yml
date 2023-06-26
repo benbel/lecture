@@ -24,6 +24,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - run: python programs/download_data.py
+    - uses: devops-infra/action-commit-push@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        commit_message: [auto] mise à jour des liens
     - run: python programs/build_page.py
     - uses: actions/upload-artifact@v3
       with:
