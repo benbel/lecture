@@ -27,7 +27,7 @@ jobs:
     - uses: devops-infra/action-commit-push@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        commit_message: [auto] mise à jour des liens
+        commit_message:  mise à jour automatique des liens
     - run: python programs/build_page.py
     - uses: actions/upload-artifact@v3
       with:
